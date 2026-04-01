@@ -51,6 +51,21 @@ const columnLabels: Record<string, string> = {
   lastSeenAt: "Последний вход",
 }
 
+function formatServerDate(value: string | null): string {
+  if (!value) return "Нет данных"
+  return value.includes("T")
+    ? new Intl.DateTimeFormat("ru-RU", {
+        timeZone: "Europe/Moscow",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(new Date(value))
+    : value
+}
+
 function ConfirmDeleteButton({
   title,
   onConfirm,
@@ -99,7 +114,7 @@ function UserCellViewer({
   user: SystemUser
   onUsersChanged: () => Promise<void>
 }) {
-  const lastSeenText = user.lastSeenAt ? new Date(user.lastSeenAt).toLocaleString() : "Нет данных"
+  const lastSeenText = formatServerDate(user.lastSeenAt)
 
   const isMobile = useIsMobile()
   const [editOpen, setEditOpen] = React.useState(false)
@@ -298,7 +313,7 @@ function getUserColumns(onUsersChanged: () => Promise<void>): ColumnDef<SystemUs
       header: "Последний вход",
       cell: ({ row }) => (
         <span className="text-muted-foreground">
-          {row.original.lastSeenAt ? new Date(row.original.lastSeenAt).toLocaleString() : "Нет данных"}
+          {formatServerDate(row.original.lastSeenAt)}
         </span>
       ),
     },
